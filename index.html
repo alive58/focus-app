@@ -5,135 +5,170 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحدي التركيز العميق</title>
     <style>
-        :root { --bg: #0f172a; --primary: #06b6d4; --danger: #ef4444; }
-        body { background: var(--bg); color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        .card { background: #1e293b; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 85%; max-width: 400px; }
-        #timer { font-size: 5rem; font-weight: bold; margin: 1rem 0; color: var(--primary); }
-        button { background: var(--primary); border: none; padding: 1rem 2rem; border-radius: 50px; color: white; font-size: 1.2rem; cursor: pointer; width: 100%; transition: 0.3s; }
-        button:active { transform: scale(0.95); }
-        .stats { margin-top: 1.5rem; font-size: 0.9rem; color: #94a3b8; }
-        input { background: #334155; border: 1px solid #475569; color: white; padding: 0.5rem; border-radius: 10px; width: 80%; margin-bottom: 1rem; text-align: center; }
-        .settings { margin-top: 1rem; font-size: 0.8rem; border-top: 1px solid #334155; padding-top: 1rem; }
+        :root { --bg: #030712; --card-bg: #111827; --primary: #06b6d4; --danger: #ef4444; --text: #f9fafb; --text-muted: #94a3b8; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: start; min-height: 100vh; margin: 0; padding-top: 2rem; }
+        h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        h1 span { color: var(--danger); }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; text-align: center; }
+        
+        .timer-options { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .mode-btn, .time-btn, .custom-apply { background: #1f2937; border: none; color: var(--text); padding: 0.5rem 1rem; border-radius: 50px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .mode-btn.active, .time-btn.active { background: var(--primary); color: #fff; }
+        .time-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; max-width: 320px; margin-bottom: 1rem; }
+
+        .custom-time-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; justify-content: center; }
+        .custom-time-input { background: #1f2937; border: 1px solid #374151; color: var(--text); padding: 0.5rem; border-radius: 10px; width: 60px; text-align: center; font-size: 0.9rem; }
+        .custom-apply { background: #0c4a6e; color: var(--primary); }
+
+        .timer-display-card { position: relative; width: 180px; height: 180px; margin-bottom: 1.5rem; }
+        .timer-display-card circle { fill: none; stroke-width: 8; stroke-linecap: round; }
+        .timer-display-card .bg-circle { stroke: #1f2937; }
+        .timer-display-card .progress-circle { stroke: var(--primary); stroke-dasharray: 565; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; transform: rotate(-90deg); transform-origin: 50% 50%; }
+        #timer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3.2rem; font-weight: bold; }
+
+        .action-btn { background: var(--primary); border: none; color: white; padding: 1rem; border-radius: 15px; font-size: 1.2rem; cursor: pointer; width: 85%; max-width: 300px; font-weight: bold; transition: 0.3s; margin-bottom: 1rem; }
+        .action-btn:active { transform: scale(0.95); }
+        .action-btn.stop { background: var(--danger); }
+
+        .stats-card { background: var(--card-bg); width: 85%; max-width: 300px; border-radius: 15px; padding: 1rem; border: 1px solid #1f2937; margin-bottom: 1rem; text-align: center; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.3rem; margin-bottom: 0.3rem; }
+        .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+
+        .settings-card { background: var(--card-bg); width: 85%; max-width: 300px; border-radius: 15px; padding: 1rem; border: 1px solid #1f2937; text-align: center; font-size: 0.9rem; }
+        .settings-card summary { cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.3rem; list-style: none; }
+        .settings-card summary::-webkit-details-marker { display: none; }
+        .settings-card input { background: #1f2937; border: 1px solid #374151; color: var(--text); padding: 0.6rem; border-radius: 10px; width: 90%; margin: 0.5rem 0; text-align: center; font-size: 0.8rem; }
+        #saveSettings { background: var(--primary); border: none; color: white; padding: 0.6rem; border-radius: 10px; width: 95%; cursor: pointer; margin-top: 0.5rem; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>🎯 تحدي التركيز</h2>
-    <div id="timer">05:00</div>
-    
-    <input type="number" id="customTime" placeholder="أدخل الدقائق يدوياً">
-    <button id="startBtn">ابدأ التحدي</button>
+    <h1>تحدّي التركيز <span>🎯</span></h1>
+    <div class="subtitle">اختر الوضع والمدة، ضع جوالك على الطاولة واضغط ابدأ!</div>
 
-    <div class="stats">
-        <div>إجمالي وقت الدراسة: <span id="totalStudy">0</span> دقيقة</div>
-        <div>المخالفات: <span id="violations" style="color: var(--danger);">0</span></div>
+    <div class="timer-options">
+        <button class="mode-btn">🍅 بومودورو</button>
+        <button class="mode-btn active">⏱️ مؤقت حر</button>
     </div>
 
-    <div class="settings">
+    <div class="time-options">
+        <button class="time-btn" data-time="1">١ دقيقة</button>
+        <button class="time-btn active" data-time="5">٥ دقائق</button>
+        <button class="time-btn" data-time="15">١٥ دقيقة</button>
+        <button class="time-btn" data-time="30">٣٠ دقيقة</button>
+        <button class="time-btn" data-time="60">٦٠ دقيقة</button>
+    </div>
+
+    <div class="custom-time-row">
+        <input type="number" id="customTime" class="custom-time-input" placeholder="مثال: ٤٥">
+        <button id="applyCustom" class="custom-apply">تطبيق (دقيقة)</button>
+    </div>
+
+    <div class="timer-display-card">
+        <svg width="180" height="180" viewBox="0 0 200 200">
+            <circle class="bg-circle" cx="100" cy="100" r="90" />
+            <circle class="progress-circle" id="progressCircle" cx="100" cy="100" r="90" />
+        </svg>
+        <div id="timer">05:00</div>
+    </div>
+
+    <button id="startBtn" class="action-btn">ابدأ التحدي</button>
+
+    <div class="stats-card">
+        <div class="stat-label">📚 إجمالي وقت الدراسة</div>
+        <div class="stat-value"><span id="totalStudy">0</span> دقيقة</div>
+    </div>
+
+    <div class="settings-card">
         <details>
-            <summary>⚙️ إعدادات تليجرام</summary>
+            <summary>🚀 ربط تليجرام</summary>
+            <p style="font-size: 0.7rem; color: #6b7280; margin: 0.5rem 0;">البيانات تحفظ محلياً فقط على جهازك.</p>
             <input type="text" id="token" placeholder="Bot Token">
             <input type="text" id="chatId" placeholder="Chat ID">
+            <button id="saveSettings">حفظ</button>
         </details>
     </div>
-</div>
 
-<audio id="alarm" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" loop></audio>
+    <audio id="alarm" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" loop></audio>
 
-<script>
-    let timerDisplay = document.getElementById('timer');
-    let startBtn = document.getElementById('startBtn');
-    let alarm = document.getElementById('alarm');
-    let isRunning = false;
-    let secondsLeft = 300;
-    let totalMinutes = localStorage.getItem('totalStudy') || 0;
-    let violations = 0;
-    let interval;
-
-    document.getElementById('totalStudy').innerText = totalMinutes;
-
-    startBtn.onclick = () => {
-        if (!isRunning) {
-            let custom = document.getElementById('customTime').value;
-            if(custom) secondsLeft = custom * 60;
-            
-            // طلب إذن الحساسات للأندرويد/آيفون
-            if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission();
-            }
-            
-            startChallenge();
-        } else {
-            stopChallenge();
-        }
-    };
-
-    function startChallenge() {
-        isRunning = true;
-        startBtn.innerText = "إيقاف";
-        startBtn.style.background = "#ef4444";
+    <script>
+        let isRunning = false, secondsLeft = 300, totalSeconds = 300, interval, alarm = document.getElementById('alarm');
+        const timerDisplay = document.getElementById('timer'), startBtn = document.getElementById('startBtn'), progressCircle = document.getElementById('progressCircle'), totalStudyDisplay = document.getElementById('totalStudy');
         
-        interval = setInterval(() => {
-            secondsLeft--;
+        totalStudyDisplay.innerText = localStorage.getItem('totalStudyMinutes') || 0;
+
+        document.querySelectorAll('.time-btn').forEach(btn => btn.onclick = function() {
+            if(isRunning) return;
+            document.querySelector('.time-btn.active').classList.remove('active');
+            this.classList.add('active');
+            secondsLeft = totalSeconds = parseInt(this.dataset.time) * 60;
             updateDisplay();
-            if (secondsLeft <= 0) {
-                completeChallenge();
+        });
+
+        document.getElementById('applyCustom').onclick = () => {
+            if(isRunning) return;
+            let customMins = document.getElementById('customTime').value;
+            if(customMins > 0) {
+                secondsLeft = totalSeconds = customMins * 60;
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                updateDisplay();
             }
-        }, 1000);
+        };
 
-        window.addEventListener('devicemotion', handleMotion);
-    }
+        document.getElementById('saveSettings').onclick = () => {
+            localStorage.setItem('botToken', document.getElementById('token').value);
+            localStorage.setItem('chatId', document.getElementById('chatId').value);
+            alert('تم حفظ الإعدادات!');
+        };
 
-    function stopChallenge() {
-        clearInterval(interval);
-        isRunning = false;
-        startBtn.innerText = "ابدأ التحدي";
-        startBtn.style.background = "#06b6d4";
-        alarm.pause();
-        window.removeEventListener('devicemotion', handleMotion);
-    }
+        window.onload = () => {
+            document.getElementById('token').value = localStorage.getItem('botToken') || '';
+            document.getElementById('chatId').value = localStorage.getItem('chatId') || '';
+        };
 
-    function updateDisplay() {
-        let m = Math.floor(secondsLeft / 60);
-        let s = secondsLeft % 60;
-        timerDisplay.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
+        startBtn.onclick = () => {
+            if (!isRunning) {
+                if (typeof DeviceMotionEvent?.requestPermission === 'function') DeviceMotionEvent.requestPermission();
+                isRunning = true; startBtn.innerText = "إيقاف التحدي"; startBtn.classList.add('stop');
+                interval = setInterval(tick, 1000);
+                window.addEventListener('devicemotion', handleMotion);
+            } else { stopChallenge(); }
+        };
 
-    function handleMotion(event) {
-        let acc = event.accelerationIncludingGravity;
-        let threshold = 12; // عتبة الحساسية
-        let totalAcc = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
-
-        if (totalAcc > threshold + 3 || totalAcc < threshold - 3) {
-            if (alarm.paused) {
-                alarm.play();
-                violations++;
-                document.getElementById('violations').innerText = violations;
-                sendTelegram("⚠️ لقد لمست الجوال! عد للدراسة فوراً.");
-            }
-        } else {
-            alarm.pause();
+        function tick() {
+            secondsLeft--; updateDisplay();
+            if (secondsLeft <= 0) { completeChallenge(); }
         }
-    }
 
-    function completeChallenge() {
-        stopChallenge();
-        let sessionMinutes = Math.floor(document.getElementById('customTime').value || 5);
-        totalMinutes = parseInt(totalMinutes) + sessionMinutes;
-        localStorage.setItem('totalStudy', totalMinutes);
-        document.getElementById('totalStudy').innerText = totalMinutes;
-        sendTelegram(`✅ أحسنت! أكملت ${sessionMinutes} دقيقة دراسة. إجمالي وقتك: ${totalMinutes} دقيقة.`);
-        alert("تم التحدي بنجاح!");
-    }
-
-    function sendTelegram(msg) {
-        let token = document.getElementById('token').value;
-        let id = document.getElementById('chatId').value;
-        if(token && id) {
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${id}&text=${encodeURIComponent(msg)}`);
+        function stopChallenge() {
+            clearInterval(interval); isRunning = false; startBtn.innerText = "ابدأ التحدي"; startBtn.classList.remove('stop');
+            alarm.pause(); window.removeEventListener('devicemotion', handleMotion);
         }
-    }
-</script>
+
+        function updateDisplay() {
+            timerDisplay.innerText = `${Math.floor(secondsLeft/60).toString().padStart(2,'0')}:${(secondsLeft%60).toString().padStart(2,'0')}`;
+            progressCircle.style.strokeDashoffset = (565 - (secondsLeft / totalSeconds) * 565);
+        }
+
+        function completeChallenge() {
+            stopChallenge();
+            let addedMins = Math.floor(totalSeconds / 60);
+            let currentTotal = parseInt(localStorage.getItem('totalStudyMinutes') || 0) + addedMins;
+            localStorage.setItem('totalStudyMinutes', currentTotal);
+            totalStudyDisplay.innerText = currentTotal;
+            sendTelegram(`✅ أحسنت! أكملت ${addedMins} دقيقة دراسة. إجمالي وقتك: ${currentTotal} دقيقة.`);
+            alert("تم التحدي بنجاح!");
+        }
+
+        function handleMotion(e) {
+            let a = e.accelerationIncludingGravity, t = 12, tot = Math.sqrt(a.x**2 + a.y**2 + a.z**2);
+            if (tot > t+3 || tot < t-3) { if(alarm.paused) { alarm.play(); sendTelegram("⚠️ لمست الجوال! عد للدراسة."); } } else { alarm.pause(); }
+        }
+
+        function sendTelegram(msg) {
+            let t = localStorage.getItem('botToken'), c = localStorage.getItem('chatId');
+            if(t && c) fetch(`https://api.telegram.org/bot${t}/sendMessage?chat_id=${c}&text=${encodeURIComponent(msg)}`);
+        }
+    </script>
 </body>
 </html>
