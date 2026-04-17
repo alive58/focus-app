@@ -6,7 +6,7 @@
     <title>تحدي التركيز العميق</title>
     <style>
         :root { --bg: #030712; --card-bg: #111827; --primary: #06b6d4; --danger: #ef4444; --text: #f9fafb; --text-muted: #94a3b8; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: start; min-height: 100vh; margin: 0; padding-top: 1.5rem; touch-action: manipulation; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: start; min-height: 100vh; margin: 0; padding-top: 1.5rem; touch-action: manipulation; overflow: hidden; }
         h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
         h1 span { color: var(--danger); }
         .subtitle { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem; text-align: center; padding: 0 1rem; }
@@ -22,7 +22,7 @@
         .timer-display-card .bg-circle { stroke: #1f2937; }
         .timer-display-card .progress-circle { stroke: var(--primary); stroke-dasharray: 565; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; transform: rotate(-90deg); transform-origin: 50% 50%; }
         #timer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-weight: bold; }
-        .action-btn { background: var(--primary); border: none; color: white; padding: 0.9rem; border-radius: 15px; font-size: 1.1rem; cursor: pointer; width: 85%; max-width: 300px; font-weight: bold; margin-bottom: 1rem; transition: 0.3s; }
+        .action-btn { background: var(--primary); border: none; color: white; padding: 0.9rem; border-radius: 15px; font-size: 1.1rem; cursor: pointer; width: 85%; max-width: 300px; font-weight: bold; margin-bottom: 1rem; }
         .action-btn.stop { background: var(--danger); }
         .stats-card { background: var(--card-bg); width: 85%; max-width: 300px; border-radius: 12px; padding: 0.8rem; border: 1px solid #1f2937; margin-bottom: 1rem; text-align: center; }
         .stat-value { font-size: 1.1rem; font-weight: bold; color: var(--primary); }
@@ -34,7 +34,7 @@
 <body>
 
     <h1>تحدّي التركيز <span>🎯</span></h1>
-    <div class="subtitle">تلقائياً: ستبقى الشاشة مفعّلة ولن تنطفئ أثناء التحدي.</div>
+    <div class="subtitle">تم تعديل الحساس ليكون أكثر استقراراً.</div>
 
     <div class="timer-options">
         <button class="mode-btn">🍅 بومودورو</button>
@@ -84,18 +84,13 @@
         
         totalStudyDisplay.innerText = localStorage.getItem('totalStudyMinutes') || 0;
 
-        // ميزة منع إطفاء الشاشة
         async function requestWakeLock() {
-            try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) { console.error(`${err.name}, ${err.message}`); }
+            try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
         }
 
-        // ميزة الشاشة الكاملة
         function enableFullScreen() {
             let doc = document.documentElement;
             if (doc.requestFullscreen) doc.requestFullscreen();
-            else if (doc.mozRequestFullScreen) doc.mozRequestFullScreen();
-            else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
-            else if (doc.msRequestFullscreen) doc.msRequestFullscreen();
         }
 
         document.querySelectorAll('.time-btn').forEach(btn => btn.onclick = function() {
@@ -115,7 +110,7 @@
         document.getElementById('saveSettings').onclick = () => {
             localStorage.setItem('botToken', document.getElementById('token').value);
             localStorage.setItem('chatId', document.getElementById('chatId').value);
-            alert('تم الحفظ! سيصلك تنبيه عند بدء التحدي للتأكد.');
+            alert('تم الحفظ!');
         };
 
         window.onload = () => {
@@ -131,7 +126,7 @@
                 isRunning = true; 
                 startBtn.innerText = "إيقاف"; 
                 startBtn.classList.add('stop');
-                sendTelegram("🚀 تم بدء تحدي التركيز.. لا تلمس الجوال!"); 
+                sendTelegram("🚀 بدأ التحدي الآن!"); 
                 interval = setInterval(tick, 1000);
                 window.addEventListener('devicemotion', handleMotion);
             } else { stopChallenge(); }
@@ -146,7 +141,6 @@
             clearInterval(interval); isRunning = false; startBtn.innerText = "ابدأ التحدي"; startBtn.classList.remove('stop');
             alarm.pause(); window.removeEventListener('devicemotion', handleMotion);
             if (wakeLock) { wakeLock.release(); wakeLock = null; }
-            if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen();
         }
 
         function updateDisplay() {
@@ -159,24 +153,29 @@
             let currentTotal = parseInt(localStorage.getItem('totalStudyMinutes') || 0) + addedMins;
             localStorage.setItem('totalStudyMinutes', currentTotal);
             totalStudyDisplay.innerText = currentTotal;
-            sendTelegram(`✅ برافو! أكملت ${addedMins} دقيقة دراسة. مجموعك اليوم: ${currentTotal} دقيقة.`);
+            sendTelegram(`✅ أحسنت! أكملت ${addedMins} دقيقة.`);
             stopChallenge();
-            alert("تم التحدي بنجاح!");
         }
 
+        // التعديل هنا: عتبة الحساسية (Threshold)
         function handleMotion(e) {
-            let a = e.accelerationIncludingGravity, t = 12, tot = Math.sqrt(a.x**2 + a.y**2 + a.z**2);
-            if (tot > t+3 || tot < t-3) { 
+            let a = e.accelerationIncludingGravity;
+            if (!a) return;
+            let g = 9.8; // الجاذبية الطبيعية
+            let totalAcc = Math.sqrt(a.x**2 + a.y**2 + a.z**2);
+            
+            // رفعنا الرقم لـ 15 ليتحمل الحركة البسيطة، ولا يصفر إلا عند التحريك الفعلي
+            if (totalAcc > 15 || totalAcc < 5) { 
                 if(alarm.paused) { 
                     alarm.play(); 
-                    sendTelegram("⚠️ لمست الجوال! عد للتركيز فوراً."); 
+                    sendTelegram("⚠️ لمست الجوال!"); 
                 } 
             } else { alarm.pause(); }
         }
 
         function sendTelegram(msg) {
             let t = localStorage.getItem('botToken'), c = localStorage.getItem('chatId');
-            if(t && c) fetch(`https://api.telegram.org/bot${t}/sendMessage?chat_id=${c}&text=${encodeURIComponent(msg)}`).catch(err => console.error(err));
+            if(t && c) fetch(`https://api.telegram.org/bot${t}/sendMessage?chat_id=${c}&text=${encodeURIComponent(msg)}`);
         }
     </script>
 </body>
