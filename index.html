@@ -2,49 +2,39 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تحدي التركيز العميق</title>
     <style>
         :root { --bg: #030712; --card-bg: #111827; --primary: #06b6d4; --danger: #ef4444; --text: #f9fafb; --text-muted: #94a3b8; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: start; min-height: 100vh; margin: 0; padding-top: 2rem; }
-        h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: start; min-height: 100vh; margin: 0; padding-top: 1.5rem; touch-action: manipulation; }
+        h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
         h1 span { color: var(--danger); }
-        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; text-align: center; }
-        
+        .subtitle { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem; text-align: center; padding: 0 1rem; }
         .timer-options { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        .mode-btn, .time-btn, .custom-apply { background: #1f2937; border: none; color: var(--text); padding: 0.5rem 1rem; border-radius: 50px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .mode-btn, .time-btn, .custom-apply { background: #1f2937; border: none; color: var(--text); padding: 0.5rem 0.8rem; border-radius: 50px; cursor: pointer; font-size: 0.85rem; }
         .mode-btn.active, .time-btn.active { background: var(--primary); color: #fff; }
-        .time-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; max-width: 320px; margin-bottom: 1rem; }
-
-        .custom-time-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; justify-content: center; }
-        .custom-time-input { background: #1f2937; border: 1px solid #374151; color: var(--text); padding: 0.5rem; border-radius: 10px; width: 60px; text-align: center; font-size: 0.9rem; }
+        .time-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; max-width: 320px; margin-bottom: 1rem; }
+        .custom-time-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .custom-time-input { background: #1f2937; border: 1px solid #374151; color: var(--text); padding: 0.5rem; border-radius: 10px; width: 50px; text-align: center; }
         .custom-apply { background: #0c4a6e; color: var(--primary); }
-
-        .timer-display-card { position: relative; width: 180px; height: 180px; margin-bottom: 1.5rem; }
+        .timer-display-card { position: relative; width: 170px; height: 170px; margin-bottom: 1.5rem; }
         .timer-display-card circle { fill: none; stroke-width: 8; stroke-linecap: round; }
         .timer-display-card .bg-circle { stroke: #1f2937; }
         .timer-display-card .progress-circle { stroke: var(--primary); stroke-dasharray: 565; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; transform: rotate(-90deg); transform-origin: 50% 50%; }
-        #timer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3.2rem; font-weight: bold; }
-
-        .action-btn { background: var(--primary); border: none; color: white; padding: 1rem; border-radius: 15px; font-size: 1.2rem; cursor: pointer; width: 85%; max-width: 300px; font-weight: bold; transition: 0.3s; margin-bottom: 1rem; }
-        .action-btn:active { transform: scale(0.95); }
+        #timer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-weight: bold; }
+        .action-btn { background: var(--primary); border: none; color: white; padding: 0.9rem; border-radius: 15px; font-size: 1.1rem; cursor: pointer; width: 85%; max-width: 300px; font-weight: bold; margin-bottom: 1rem; }
         .action-btn.stop { background: var(--danger); }
-
-        .stats-card { background: var(--card-bg); width: 85%; max-width: 300px; border-radius: 15px; padding: 1rem; border: 1px solid #1f2937; margin-bottom: 1rem; text-align: center; }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.3rem; margin-bottom: 0.3rem; }
-        .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
-
-        .settings-card { background: var(--card-bg); width: 85%; max-width: 300px; border-radius: 15px; padding: 1rem; border: 1px solid #1f2937; text-align: center; font-size: 0.9rem; }
-        .settings-card summary { cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.3rem; list-style: none; }
-        .settings-card summary::-webkit-details-marker { display: none; }
-        .settings-card input { background: #1f2937; border: 1px solid #374151; color: var(--text); padding: 0.6rem; border-radius: 10px; width: 90%; margin: 0.5rem 0; text-align: center; font-size: 0.8rem; }
-        #saveSettings { background: var(--primary); border: none; color: white; padding: 0.6rem; border-radius: 10px; width: 95%; cursor: pointer; margin-top: 0.5rem; }
+        .stats-card { background: var(--card-bg); width: 85%; max-width: 300px; border-radius: 12px; padding: 0.8rem; border: 1px solid #1f2937; margin-bottom: 1rem; text-align: center; }
+        .stat-value { font-size: 1.1rem; font-weight: bold; color: var(--primary); }
+        .settings-card { background: var(--card-bg); width: 85%; max-width: 300px; border-radius: 12px; padding: 0.8rem; border: 1px solid #1f2937; text-align: center; }
+        .settings-card input { background: #1f2937; border: 1px solid #374151; color: var(--text); padding: 0.5rem; border-radius: 8px; width: 90%; margin: 0.4rem 0; text-align: center; font-size: 0.75rem; }
+        #saveSettings { background: var(--primary); border: none; color: white; padding: 0.5rem; border-radius: 8px; width: 95%; cursor: pointer; margin-top: 0.4rem; }
     </style>
 </head>
 <body>
 
     <h1>تحدّي التركيز <span>🎯</span></h1>
-    <div class="subtitle">اختر الوضع والمدة، ضع جوالك على الطاولة واضغط ابدأ!</div>
+    <div class="subtitle">تلقائياً: ستبقى الشاشة مفعّلة ولن تنطفئ أثناء التحدي.</div>
 
     <div class="timer-options">
         <button class="mode-btn">🍅 بومودورو</button>
@@ -56,16 +46,15 @@
         <button class="time-btn active" data-time="5">٥ دقائق</button>
         <button class="time-btn" data-time="15">١٥ دقيقة</button>
         <button class="time-btn" data-time="30">٣٠ دقيقة</button>
-        <button class="time-btn" data-time="60">٦٠ دقيقة</button>
     </div>
 
     <div class="custom-time-row">
-        <input type="number" id="customTime" class="custom-time-input" placeholder="مثال: ٤٥">
-        <button id="applyCustom" class="custom-apply">تطبيق (دقيقة)</button>
+        <input type="number" id="customTime" class="custom-time-input" placeholder="٤٥">
+        <button id="applyCustom" class="custom-apply">تطبيق</button>
     </div>
 
     <div class="timer-display-card">
-        <svg width="180" height="180" viewBox="0 0 200 200">
+        <svg width="170" height="170" viewBox="0 0 200 200">
             <circle class="bg-circle" cx="100" cy="100" r="90" />
             <circle class="progress-circle" id="progressCircle" cx="100" cy="100" r="90" />
         </svg>
@@ -75,27 +64,35 @@
     <button id="startBtn" class="action-btn">ابدأ التحدي</button>
 
     <div class="stats-card">
-        <div class="stat-label">📚 إجمالي وقت الدراسة</div>
-        <div class="stat-value"><span id="totalStudy">0</span> دقيقة</div>
+        <div class="stat-value">إجمالي وقت الدراسة: <span id="totalStudy">0</span> دقيقة</div>
     </div>
 
     <div class="settings-card">
         <details>
-            <summary>🚀 ربط تليجرام</summary>
-            <p style="font-size: 0.7rem; color: #6b7280; margin: 0.5rem 0;">البيانات تحفظ محلياً فقط على جهازك.</p>
+            <summary>⚙️ إعدادات تليجرام</summary>
             <input type="text" id="token" placeholder="Bot Token">
             <input type="text" id="chatId" placeholder="Chat ID">
-            <button id="saveSettings">حفظ</button>
+            <button id="saveSettings">حفظ الإعدادات</button>
         </details>
     </div>
 
     <audio id="alarm" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" loop></audio>
 
     <script>
-        let isRunning = false, secondsLeft = 300, totalSeconds = 300, interval, alarm = document.getElementById('alarm');
-        const timerDisplay = document.getElementById('timer'), startBtn = document.getElementById('startBtn'), progressCircle = document.getElementById('progressCircle'), totalStudyDisplay = document.getElementById('totalStudy');
+        let isRunning = false, secondsLeft = 300, totalSeconds = 300, interval, wakeLock = null;
+        const alarm = document.getElementById('alarm'), timerDisplay = document.getElementById('timer'), startBtn = document.getElementById('startBtn'), progressCircle = document.getElementById('progressCircle'), totalStudyDisplay = document.getElementById('totalStudy');
         
         totalStudyDisplay.innerText = localStorage.getItem('totalStudyMinutes') || 0;
+
+        // ميزة منع إطفاء الشاشة
+        async function requestWakeLock() {
+            try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) { console.log(err.name, err.message); }
+        }
+
+        // ميزة الشاشة الكاملة
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
+        }
 
         document.querySelectorAll('.time-btn').forEach(btn => btn.onclick = function() {
             if(isRunning) return;
@@ -107,18 +104,14 @@
 
         document.getElementById('applyCustom').onclick = () => {
             if(isRunning) return;
-            let customMins = document.getElementById('customTime').value;
-            if(customMins > 0) {
-                secondsLeft = totalSeconds = customMins * 60;
-                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-                updateDisplay();
-            }
+            let val = document.getElementById('customTime').value;
+            if(val > 0) { secondsLeft = totalSeconds = val * 60; updateDisplay(); }
         };
 
         document.getElementById('saveSettings').onclick = () => {
             localStorage.setItem('botToken', document.getElementById('token').value);
             localStorage.setItem('chatId', document.getElementById('chatId').value);
-            alert('تم حفظ الإعدادات!');
+            alert('تم الحفظ! جرب الآن بدء التحدي.');
         };
 
         window.onload = () => {
@@ -129,7 +122,9 @@
         startBtn.onclick = () => {
             if (!isRunning) {
                 if (typeof DeviceMotionEvent?.requestPermission === 'function') DeviceMotionEvent.requestPermission();
-                isRunning = true; startBtn.innerText = "إيقاف التحدي"; startBtn.classList.add('stop');
+                requestWakeLock(); // تفعيل منع إطفاء الشاشة
+                toggleFullScreen(); // تفعيل الشاشة الكاملة
+                isRunning = true; startBtn.innerText = "إيقاف"; startBtn.classList.add('stop');
                 interval = setInterval(tick, 1000);
                 window.addEventListener('devicemotion', handleMotion);
             } else { stopChallenge(); }
@@ -137,12 +132,13 @@
 
         function tick() {
             secondsLeft--; updateDisplay();
-            if (secondsLeft <= 0) { completeChallenge(); }
+            if (secondsLeft <= 0) completeChallenge();
         }
 
         function stopChallenge() {
             clearInterval(interval); isRunning = false; startBtn.innerText = "ابدأ التحدي"; startBtn.classList.remove('stop');
             alarm.pause(); window.removeEventListener('devicemotion', handleMotion);
+            if (wakeLock) { wakeLock.release(); wakeLock = null; }
         }
 
         function updateDisplay() {
@@ -151,18 +147,22 @@
         }
 
         function completeChallenge() {
-            stopChallenge();
             let addedMins = Math.floor(totalSeconds / 60);
             let currentTotal = parseInt(localStorage.getItem('totalStudyMinutes') || 0) + addedMins;
             localStorage.setItem('totalStudyMinutes', currentTotal);
             totalStudyDisplay.innerText = currentTotal;
-            sendTelegram(`✅ أحسنت! أكملت ${addedMins} دقيقة دراسة. إجمالي وقتك: ${currentTotal} دقيقة.`);
-            alert("تم التحدي بنجاح!");
+            sendTelegram(`✅ بطل! أكملت ${addedMins} دقيقة. المجموع: ${currentTotal} دقيقة.`);
+            stopChallenge();
         }
 
         function handleMotion(e) {
             let a = e.accelerationIncludingGravity, t = 12, tot = Math.sqrt(a.x**2 + a.y**2 + a.z**2);
-            if (tot > t+3 || tot < t-3) { if(alarm.paused) { alarm.play(); sendTelegram("⚠️ لمست الجوال! عد للدراسة."); } } else { alarm.pause(); }
+            if (tot > t+3 || tot < t-3) { 
+                if(alarm.paused) { 
+                    alarm.play(); 
+                    sendTelegram("⚠️ انتباه! لقد لمست الجوال. عد للتركيز."); 
+                } 
+            } else { alarm.pause(); }
         }
 
         function sendTelegram(msg) {
